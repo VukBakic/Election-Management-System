@@ -15,3 +15,5 @@ The project specification can be found in: <b><a href="https://github.com/VukBak
   <li>Redis</li>
   <li>JSON Web Tokens for user authentication and authorization</li>
 </ul>
+
+<a href="https://github.com/VukBakic/Election-Management-System/blob/main/IEP%20Projekat.postman_collection.json">Postman collection</a> is used to quickly import API endpoints into Postman.
