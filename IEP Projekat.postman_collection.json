@@ -1,0 +1,445 @@
+{
+	"info": {
+		"_postman_id": "243a12b6-b143-451a-ad84-d54727e94328",
+		"name": "IEP Projekat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"jmbg\":\"0901997710210\",\r\n   \"forename\":\"Vuk\",\r\n   \"surname\":\"Bakic\",\r\n   \"email\":\"bakic.vuk@gmail.com\",\r\n   \"password\":\"VukBakic1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{AUTHENTICATION_URI}}/register",
+							"host": [
+								"{{AUTHENTICATION_URI}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"admin@admin.com\",\r\n    \"password\":\"1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{AUTHENTICATION_URI}}/login",
+							"host": [
+								"{{AUTHENTICATION_URI}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMIN_JWT_REFRESH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{AUTHENTICATION_URI}}/refresh",
+							"host": [
+								"{{AUTHENTICATION_URI}}"
+							],
+							"path": [
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMIN_JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"bakic.vuk@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{AUTHENTICATION_URI}}/delete",
+							"host": [
+								"{{AUTHENTICATION_URI}}"
+							],
+							"path": [
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Administrator",
+			"item": [
+				{
+					"name": "Create Participant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMIN_JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Partija 2\",\r\n    \"individual\":false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ADMINISTRATOR_URI}}/createParticipant",
+							"host": [
+								"{{ADMINISTRATOR_URI}}"
+							],
+							"path": [
+								"createParticipant"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Participants",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMIN_JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ADMINISTRATOR_URI}}/getParticipants",
+							"host": [
+								"{{ADMINISTRATOR_URI}}"
+							],
+							"path": [
+								"getParticipants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Election",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const moment = require('moment');\r",
+									"pm.globals.set(\"start\", moment().utc().format());\r",
+									"pm.globals.set(\"end\", moment().add(5,'m').utc().format())\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMIN_JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"start\":\"{{start}}\",\r\n    \"end\":\"{{end}}\",\r\n    \"individual\":false,\r\n    \"participants\":[1,2]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ADMINISTRATOR_URI}}/createElection",
+							"host": [
+								"{{ADMINISTRATOR_URI}}"
+							],
+							"path": [
+								"createElection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Election Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const moment = require('moment');\r",
+									"pm.globals.set(\"start\", moment().utc().format());\r",
+									"pm.globals.set(\"end\", moment().add(5,'m').utc().format())\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMIN_JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"start\":\"{{start}}\",\r\n    \"end\":\"{{end}}\",\r\n    \"individual\":false,\r\n    \"participants\":[1,2]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ADMINISTRATOR_URI}}/createElection",
+							"host": [
+								"{{ADMINISTRATOR_URI}}"
+							],
+							"path": [
+								"createElection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Elections",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMIN_JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ADMINISTRATOR_URI}}/getElections",
+							"host": [
+								"{{ADMINISTRATOR_URI}}"
+							],
+							"path": [
+								"getElections"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Results",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMIN_JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ADMINISTRATOR_URI}}/getResults?id=1",
+							"host": [
+								"{{ADMINISTRATOR_URI}}"
+							],
+							"path": [
+								"getResults"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Zvanicnik",
+			"item": [
+				{
+					"name": "Vote",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ZVANICNIK_JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/bakic/Downloads/dataJun-24-2021.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{ZVANICNIK_URI}}/vote",
+							"host": [
+								"{{ZVANICNIK_URI}}"
+							],
+							"path": [
+								"vote"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "AUTHENTICATION_URI",
+			"value": "localhost:5000"
+		},
+		{
+			"key": "ADMINISTRATOR_URI",
+			"value": "localhost:5000"
+		},
+		{
+			"key": "ZVANICNIK_URI",
+			"value": "localhost:5000"
+		},
+		{
+			"key": "ADMIN_JWT_TOKEN",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJyb2xlcyI6WyJhZG1pbmlzdHJhdG9yIl19.bCz1yRkdnL3LSNBXFAy01v09Et-SEWToZaMjbyYqi20"
+		},
+		{
+			"key": "ADMIN_JWT_REFRESH_TOKEN",
+			"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTYyNDgwNDM5MywianRpIjoiMmI3ZDczNWEtMDAyZS00OTUyLWIzNTItYWM4MjA5YzQzMGZlIiwidHlwZSI6InJlZnJlc2giLCJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJuYmYiOjE2MjQ4MDQzOTMsImV4cCI6MTYyNzM5NjM5MywiZm9yZW5hbWUiOiJhZG1pbiIsInN1cm5hbWUiOiJhZG1pbiIsImptYmciOiIwMDAwMDAwMDAwMDAiLCJyb2xlcyI6WyJhZG1pbmlzdHJhdG9yIl19.8UhsDs2sEj8xuLusqpDg5DpcpIytX1JKyvzF4HYA0tk"
+		},
+		{
+			"key": "ZVANICNIK_JWT_TOKEN",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ6dmFuaWNuaWtAYWRtaW4uY29tIiwicm9sZXMiOlsienZhbmljbmlrIl0sImptYmciOiIxMjM0NTYifQ.40nd_BF9x3BmWYe5OgRaCkfHlzlopM0mYO7J_mPRr50"
+		}
+	]
+}

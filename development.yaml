@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  authenticationDatabase:
+    image: mysql
+    environment:
+       MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+
+  electionDatabase:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3307:3306
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+
+  authentication:
+    image: authentication
+    environment:
+      DATABASE_URL: authenticationDatabase
+      FLASK_ENV: development
+      FLASK_RUN_HOST: 0.0.0.0
+      TZ: "Europe/Belgrade"
+    depends_on:
+      - authenticationDatabase
+    command: [ "./wait-for-it.sh", "-t","0", "authenticationDatabase:3306", "--", "flask","run" ]
+    ports:
+      - 5001:5000
+
+  administrator:
+    image: administrator
+    environment:
+      DATABASE_URL: electionDatabase
+      FLASK_ENV: development
+      FLASK_RUN_HOST: 0.0.0.0
+      PYTHONUNBUFFERED: 1
+      TZ: "Europe/Belgrade"
+    depends_on:
+      - electionDatabase
+    command: [ "./wait-for-it.sh", "-t","0", "electionDatabase:3306", "--", "flask","run" ]
+    ports:
+      - 5002:5000
+
+  zvanicnik:
+    image: zvanicnik
+    environment:
+      REDIS_HOST: redis
+      FLASK_ENV: development
+      FLASK_RUN_HOST: 0.0.0.0
+      TZ: "Europe/Belgrade"
+    depends_on:
+      - redis
+    command: [ "./wait-for-it.sh", "-t","0", "redis:6379", "--", "flask","run" ]
+    ports:
+      - 5003:5000
+
+  daemon:
+    image: votingdaemon
+    environment:
+      environment:
+      TZ: "Europe/Belgrade"
+      REDIS_HOST: redis
+      DATABASE_URL: electionDatabase

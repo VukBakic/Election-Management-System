@@ -1,0 +1,107 @@
+version: '3'
+
+services:
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - authNetwork
+      - adminNetwork
+  authenticationDatabase:
+    image: mysql
+    environment:
+       MYSQL_ROOT_PASSWORD: root
+    networks:
+      - authNetwork
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 10
+    volumes:
+      - authDBVolume:/var/lib/mysql
+
+  electionDatabase:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - adminNetwork
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 10
+    volumes:
+      - electionDBVolume:/var/lib/mysql
+
+
+  authentication:
+    image: authentication
+    environment:
+      DATABASE_URL: authenticationDatabase
+      FLASK_RUN_HOST : 0.0.0.0
+      FLASK_ENV : production
+    depends_on:
+      - authenticationDatabase
+    command: ["./wait-for-it.sh", "authenticationDatabase", "--", "./run.sh"]
+    networks:
+      - authNetwork
+    ports:
+      - 5000:5000
+
+  administrator:
+    image: administrator
+    environment:
+      DATABASE_URL: electionDatabase
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_ENV: production
+    depends_on:
+      - electionDatabase
+    networks:
+      - adminNetwork
+    ports:
+      - 5001:5001
+
+  voteCounter:
+    image: redis
+    ports:
+      - 6379:6379
+    networks:
+      - votingNetwork
+    volumes:
+      - redisVolume:/data
+
+  zvanicnik:
+    image: zvanicnik
+    environment:
+      REDIS_HOST: voteCounter
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_ENV: production
+    depends_on:
+      - voteCounter
+    networks:
+      - votingNetwork
+    ports:
+      - 5002:5002
+
+  daemon:
+    image: votingdaemon
+    environment:
+      REDIS_HOST: voteCounter
+      DATABASE_URL: electionDatabase
+    depends_on:
+      - electionDatabase
+      - voteCounter
+    networks:
+      - votingNetwork
+
+networks:
+  authNetwork:
+  adminNetwork:
+  votingNetwork:
+
+volumes:
+  authDBVolume:
+  electionDBVolume:
+  redisVolume:
