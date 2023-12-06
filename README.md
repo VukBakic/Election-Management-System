@@ -9,7 +9,7 @@ The project specification can be found in: <b><a href="https://github.com/VukBak
 <b>Technologies used in this project:</b>
 <ul>
   <li>Python Flask</li>
-  <li>SQLAlchemy<li>
+  <li>SQLAlchemy</li>
   <li>Docker</li>
   <li>Docker Swarm</li>
   <li>Redis</li>
